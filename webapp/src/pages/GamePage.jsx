@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Card from "../components/Card";
+import { useWebSocket } from "../contexts/WebSocketContext";
 
 const GamePage = () => {
   const [myCardSymbol, setMyCardSymbol] = useState("");
   const [groupCardSymbol, setGroupCardSymbol] = useState("");
+  const { currentCard, currentGroupCard } = useWebSocket();
 
   const clickMyCard = (src) => {
     console.log(`You clicked on ${src}`);
@@ -42,9 +44,9 @@ const GamePage = () => {
       }}
     >
       <div style={{ paddingBottom: "30px" }}>
-        <Card srcs={[]} onClick={clickGroupCard} />
+        <Card srcs={currentGroupCard} onClick={clickGroupCard} />
       </div>
-      <Card srcs={[]} onClick={clickMyCard} />
+      <Card srcs={currentGroupCard} onClick={clickMyCard} />
     </div>
   );
 };

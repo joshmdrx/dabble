@@ -1,11 +1,13 @@
 import React from "react";
 import Symbol from "./Symbol";
+import { imageLookup } from "../utils/dobble";
 
 const Card = ({ srcs, onClick }) => {
   const symbols = [];
   const cardSize = 300; // Diameter of the card
   const margin = 20; // Margin to prevent symbols from touching the edge of the card
   const symbolSize = 40; // Fixed size for simplicity, adjust as needed
+  const imagePath = "/";
 
   // Predefined positions for symbols
   const positions = [
@@ -38,6 +40,8 @@ const Card = ({ srcs, onClick }) => {
   positions.forEach((position, i) => {
     const rotation = Math.random() * 360; // Random rotation
     const size = Math.random() * (50 - 30) + 30; // Random size between 30px and 60px
+    const url = `${imagePath}${imageLookup[srcs[i]]}`;
+    console.log(url);
 
     symbols.push(
       <Symbol
@@ -65,5 +69,5 @@ const Card = ({ srcs, onClick }) => {
   return <div style={cardStyle}>{symbols}</div>;
 };
 
-const url = `https://picsum.photos/200`;
+// const url = `https://picsum.photos/200`;
 export default Card;

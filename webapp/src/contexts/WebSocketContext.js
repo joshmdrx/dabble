@@ -19,6 +19,9 @@ export const WebSocketProvider = ({ children }) => {
   const [players, setPlayers] = useState([]); // State to store the players list
   const [allReady, setAllReady] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const defaultCard = [1, 2, 3, 4, 5, 6, 7, 8];
+  const [currentCard, setCurrentCard] = useState(defaultCard);
+  const [currentGroupCard, setCurrentGroupCard] = useState(defaultCard);
 
   useEffect(() => {
     // Initialize WebSocket connection
@@ -46,6 +49,12 @@ export const WebSocketProvider = ({ children }) => {
           break;
         case "gameStarted":
           setGameStarted(true);
+          break;
+        case "currentCard":
+          setCurrentCard(response.card);
+          break;
+        case "currentGroupCard":
+          setCurrentGroupCard(response.card);
           break;
       }
     };
@@ -81,8 +90,19 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const beginGame = () => {
-    // Call the server to start the game
-    ws.send(JSON.stringify({ type: "beginGame" }));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "beginGame" }));
+    } else {
+      setError("WebSocket is not connected");
+    }
+  };
+
+  const sendMatch = (number) => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "match", number }));
+    } else {
+      setError("WebSocket is not connected");
+    }
   };
 
   const value = useMemo(
@@ -96,8 +116,23 @@ export const WebSocketProvider = ({ children }) => {
       allReady,
       beginGame,
       gameStarted,
+      currentCard,
+      currentGroupCard,
+      sendMatch,
     }),
-    [isConnected, error, ws, userName, players, updateReady, allReady]
+    [
+      isConnected,
+      error,
+      ws,
+      userName,
+      players,
+      updateReady,
+      allReady,
+      currentCard,
+      currentGroupCard,
+      gameStarted,
+      sendMatch,
+    ]
   );
 
   return (

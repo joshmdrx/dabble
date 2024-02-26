@@ -1,4 +1,5 @@
 // server.js
+const createCards = require("./utils.js");
 
 const WebSocket = require("ws");
 const PORT = 8123;
@@ -6,6 +7,7 @@ const PORT = 8123;
 const wss = new WebSocket.Server({ port: PORT });
 const clients = {}; // Object to hold connected clients
 let playing = false;
+let cards;
 
 const getPlayers = () => {
   const players = [];
@@ -56,6 +58,7 @@ wss.on("connection", function connection(ws) {
         return;
       }
       playing = true;
+      cards = createCards();
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({ type: "gameStarted" }));
@@ -67,7 +70,7 @@ wss.on("connection", function connection(ws) {
   ws.on("close", () => {
     // Remove client from the clients object on disconnect
     Object.keys(clients).forEach((name) => {
-      if (clients[name] === ws) {
+      if (name === ws) {
         delete clients[name];
       }
     });
