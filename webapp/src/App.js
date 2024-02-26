@@ -1,22 +1,37 @@
 import React from "react";
-import Card from "./components/Card";
-import "./App.css"; // Assuming you have an App.css file for global styles
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
+import GamePage from "./pages/GamePage";
+import LoginPage from "./pages/Login";
+import LobbyPage from "./pages/Lobby";
+import { WebSocketProvider } from "./contexts/WebSocketContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
-    <div
-      className="App"
-      style={{
-        backgroundColor: "black",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Card />
-    </div>
+    <WebSocketProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/game"
+            element={
+              <ProtectedRoute>
+                <GamePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/lobby"
+            element={
+              <ProtectedRoute>
+                <LobbyPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </WebSocketProvider>
   );
 };
-
 export default App;

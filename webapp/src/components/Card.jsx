@@ -1,7 +1,7 @@
 import React from "react";
 import Symbol from "./Symbol";
 
-const Card = () => {
+const Card = ({ srcs, onClick }) => {
   const symbols = [];
   const cardSize = 300; // Diameter of the card
   const margin = 20; // Margin to prevent symbols from touching the edge of the card
@@ -46,6 +46,7 @@ const Card = () => {
         size={size}
         angle={rotation}
         position={position}
+        onClick={onClick}
       />
     );
   });
