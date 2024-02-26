@@ -3,7 +3,7 @@ import React from "react";
 const Symbol = ({ src, size, angle, position, onClick }) => {
   const symbolStyle = {
     position: "absolute",
-    width: `${size}px`,
+    // width: `${size}px`,
     height: `${size}px`,
     transform: `rotate(${angle}deg)`,
     top: `${position.top}px`,

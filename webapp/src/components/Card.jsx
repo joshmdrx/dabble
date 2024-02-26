@@ -39,7 +39,7 @@ const Card = ({ srcs, onClick }) => {
 
   positions.forEach((position, i) => {
     const rotation = Math.random() * 360; // Random rotation
-    const size = Math.random() * (50 - 30) + 30; // Random size between 30px and 60px
+    const size = Math.random() * (80 - 50) + 30; // Random size between 30px and 60px
     const url = `${imagePath}${imageLookup[srcs[i]]}`;
     console.log(url);
 
