@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 
 import GamePage from "./pages/GamePage";
 import LoginPage from "./pages/Login";
@@ -12,6 +17,7 @@ const App = () => {
     <WebSocketProvider>
       <Router>
         <Routes>
+          <Route path="/" element={<Navigate replace to="/lobby" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/game"
@@ -29,6 +35,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<Navigate replace to="/lobby" />} />
         </Routes>
       </Router>
     </WebSocketProvider>
