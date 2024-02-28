@@ -19,7 +19,7 @@ export const WebSocketProvider = ({ children }) => {
   const [players, setPlayers] = useState([]); // State to store the players list
   const [allReady, setAllReady] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-  const defaultCard = [1, 2, 3, 4, 5, 6, 7, 8];
+  const defaultCard = [0, 0, 0, 0, 0, 0, 0, 0];
   const [currentCard, setCurrentCard] = useState(defaultCard);
   const [currentGroupCard, setCurrentGroupCard] = useState(defaultCard);
   const [gameData, setGameData] = useState("");
@@ -62,11 +62,11 @@ export const WebSocketProvider = ({ children }) => {
             setCurrentGroupCard(response.groupCard);
           }
           if (response.gameData) {
-            setGameData(response.gameData);
+            setGameData(parseGameData(response.gameData));
           }
           break;
         case "gameData":
-          setGameData(response.gameData);
+          setGameData(parseGameData(response.data));
           break;
       }
     };
@@ -115,6 +115,15 @@ export const WebSocketProvider = ({ children }) => {
     } else {
       setError("WebSocket is not connected");
     }
+  };
+
+  const parseGameData = (data) => {
+    const checkString = `${userName} got that one!`;
+    console.log(data, checkString, data === checkString);
+    if (data === checkString) {
+      return "You got that one!";
+    }
+    return data;
   };
 
   const value = useMemo(

@@ -15,8 +15,8 @@ let gameCard;
 
 const getPlayers = () => {
   const players = [];
-  Object.keys(clients).forEach((ws) => {
-    players.push({ name: clients[ws].name, score: clients[ws].score });
+  Object.keys(clients).forEach((name) => {
+    players.push({ name: name, score: clients[name].score });
   });
   return players;
 };
@@ -24,8 +24,8 @@ const getPlayers = () => {
 const beginGame = () => {
   playing = true;
   gameScores = {};
-  Object.keys(clients).forEach((ws) => {
-    gameScores[ws] = { name: clients[ws].name, score: 0 };
+  Object.keys(clients).forEach((name) => {
+    gameScores[name] = { score: 0 };
   });
   cards = createCards();
   wss.clients.forEach((client) => {
@@ -37,9 +37,30 @@ const beginGame = () => {
     sendCards();
   }, 1000);
 };
-
+const updatePlayers = () => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(
+        JSON.stringify({ type: "updatePlayers", players: getPlayers() })
+      );
+    }
+  });
+};
+const updateAllReady = () => {
+  const allReady = Object.keys(clients).every(
+    (client) => clients[client].ready
+  );
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: "allReady", allReady }));
+    }
+  });
+};
 const sendCards = (winner) => {
-  if (cards.length === 0) {
+  if (cards.length <= 0) {
+    if (winner) {
+      gameScores[winner].score += 1;
+    }
     playing = false;
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
@@ -50,9 +71,10 @@ const sendCards = (winner) => {
   }
   if (winner) {
     gameScores[winner].score += 1;
-    gameData = `${clients[winner].name} got that one!`;
+    console.log(gameScores);
+    gameData = `${winner} got that one!`;
     newCard = cards.pop();
-    winner.send(
+    clients[winner].ws.send(
       JSON.stringify({
         type: "cards",
         card: gameCard,
@@ -99,33 +121,28 @@ wss.on("connection", function connection(ws) {
     if (data.type === "connect") {
       const name = data.name;
       console.log("Client connected with name:", name);
-      // Check if the name already exists in the clients object
-      const names = Object.keys(clients).map((ws) => clients[ws].name);
 
-      if (names.includes(name) && name !== clients[ws].name) {
+      if (clients[name]) {
         // Name already exists, refuse the connection
         ws.send(
           JSON.stringify({ type: "error", message: "Name already exists" })
         );
       } else {
-        // Accept the connection
-        clients[ws] = { name: name, score: 0, ready: false };
+        // Broadcast the updated players list to all connected clients
+        clients[name] = { ws, name, score: 0, ready: false };
         ws.send(JSON.stringify({ type: "connected", players: getPlayers() }));
+        updatePlayers();
+        updateAllReady();
       }
     }
     if (data.type === "updateReady") {
       if (playing) {
         return;
       }
-      clients[ws].ready = data.ready;
-      const allReady = Object.keys(clients).every(
-        (client) => clients[client].ready
-      );
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ type: "allReady", allReady }));
-        }
-      });
+      // clients[ws].ready = data.ready;
+      const key = Object.keys(clients).find((key) => clients[key].ws === ws);
+      clients[key].ready = data.ready;
+      updateAllReady();
     }
     if (data.type === "beginGame") {
       if (playing) {
@@ -134,13 +151,25 @@ wss.on("connection", function connection(ws) {
       beginGame();
     }
     if (data.type === "match") {
-      sendCards(ws);
+      winner = Object.keys(clients).find((key) => clients[key].ws === ws);
+      sendCards(winner);
     }
   });
 
   ws.on("close", () => {
-    // Remove client from the clients object on disconnect
-    delete clients[ws];
+    // Find the key (client name or unique ID) associated with the disconnecting WebSocket
+    const keyToDelete = Object.keys(clients).find(
+      (key) => clients[key].ws === ws
+    );
+
+    if (keyToDelete) {
+      // Remove the client from the clients object using the found key
+      delete clients[keyToDelete];
+      console.log(`Client ${keyToDelete} disconnected`);
+
+      updatePlayers();
+    }
+
     if (Object.keys(clients).length === 0) {
       playing = false;
     }
