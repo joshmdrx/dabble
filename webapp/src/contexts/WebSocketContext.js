@@ -22,6 +22,7 @@ export const WebSocketProvider = ({ children }) => {
   const defaultCard = [1, 2, 3, 4, 5, 6, 7, 8];
   const [currentCard, setCurrentCard] = useState(defaultCard);
   const [currentGroupCard, setCurrentGroupCard] = useState(defaultCard);
+  const [gameData, setGameData] = useState("");
 
   useEffect(() => {
     // Initialize WebSocket connection
@@ -52,9 +53,10 @@ export const WebSocketProvider = ({ children }) => {
           break;
         case "currentCard":
           setCurrentCard(response.card);
+          setCurrentGroupCard(response.groupCard);
           break;
-        case "currentGroupCard":
-          setCurrentGroupCard(response.card);
+        case "gameData":
+          setGameData(response.data);
           break;
       }
     };
@@ -119,6 +121,7 @@ export const WebSocketProvider = ({ children }) => {
       currentCard,
       currentGroupCard,
       sendMatch,
+      gameData,
     }),
     [
       isConnected,
@@ -132,6 +135,7 @@ export const WebSocketProvider = ({ children }) => {
       currentGroupCard,
       gameStarted,
       sendMatch,
+      gameData,
     ]
   );
 

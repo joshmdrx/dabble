@@ -5,29 +5,24 @@ import { useWebSocket } from "../contexts/WebSocketContext";
 const GamePage = () => {
   const [myCardSymbol, setMyCardSymbol] = useState("");
   const [groupCardSymbol, setGroupCardSymbol] = useState("");
-  const { currentCard, currentGroupCard } = useWebSocket();
+  const { currentCard, currentGroupCard, sendMatch, gameData } = useWebSocket();
 
   const clickMyCard = (src) => {
-    console.log(`You clicked on ${src}`);
     setMyCardSymbol(src);
-    checkWinner();
   };
   const clickGroupCard = (src) => {
-    console.log(`You clicked on ${src}`);
     setGroupCardSymbol(src);
-    checkWinner();
   };
 
   useEffect(() => {
-    console.log("myCardSymbol", myCardSymbol);
-    console.log("groupCardSymbol", groupCardSymbol);
+    if (myCardSymbol && groupCardSymbol) {
+      checkWinner();
+    }
   }, [myCardSymbol, groupCardSymbol]);
 
   const checkWinner = () => {
     if (myCardSymbol === groupCardSymbol) {
-      console.log("You win!");
-    } else {
-      console.log("You lose!");
+      sendMatch(myCardSymbol);
     }
   };
 
@@ -43,10 +38,14 @@ const GamePage = () => {
         flexDirection: "column",
       }}
     >
+      <h1 style={{ color: "white" }}>Dabble</h1>
+      <h3 style={{ color: "white", paddingBottom: "30px" }}>
+        {"a got that one"}
+      </h3>
       <div style={{ paddingBottom: "30px" }}>
         <Card srcs={currentGroupCard} onClick={clickGroupCard} />
       </div>
-      <Card srcs={currentGroupCard} onClick={clickMyCard} />
+      <Card srcs={currentCard} onClick={clickMyCard} />
     </div>
   );
 };

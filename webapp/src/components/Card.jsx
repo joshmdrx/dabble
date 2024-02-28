@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Symbol from "./Symbol";
 import { imageLookup } from "../utils/dobble";
 
@@ -8,6 +8,19 @@ const Card = ({ srcs, onClick }) => {
   const margin = 20; // Margin to prevent symbols from touching the edge of the card
   const symbolSize = 40; // Fixed size for simplicity, adjust as needed
   const imagePath = "/";
+  const [sizes, setSizes] = useState([]);
+  const [rotations, setRotations] = useState([]);
+
+  useEffect(() => {
+    const sizes = [];
+    const rotations = [];
+    for (let i = 0; i < 8; i++) {
+      sizes.push(Math.random() * (80 - 50) + 30);
+      rotations.push(Math.random() * 360);
+    }
+    setSizes(sizes);
+    setRotations(rotations);
+  }, [srcs]);
 
   // Predefined positions for symbols
   const positions = [
@@ -38,10 +51,12 @@ const Card = ({ srcs, onClick }) => {
   ];
 
   positions.forEach((position, i) => {
-    const rotation = Math.random() * 360; // Random rotation
-    const size = Math.random() * (80 - 50) + 30; // Random size between 30px and 60px
+    // const rotation = Math.random() * 360; // Random rotation
+    // const size = Math.random() * (80 - 50) + 30; // Random size between 30px and 60px
+    const size = sizes[i];
+    const rotation = rotations[i];
+
     const url = `${imagePath}${imageLookup[srcs[i]]}`;
-    console.log(url);
 
     symbols.push(
       <Symbol

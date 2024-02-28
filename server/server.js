@@ -69,11 +69,8 @@ wss.on("connection", function connection(ws) {
 
   ws.on("close", () => {
     // Remove client from the clients object on disconnect
-    Object.keys(clients).forEach((name) => {
-      if (name === ws) {
-        delete clients[name];
-      }
-    });
+    console.log("Client disconnected:", clients[ws].name);
+    delete clients[ws];
   });
 });
 
