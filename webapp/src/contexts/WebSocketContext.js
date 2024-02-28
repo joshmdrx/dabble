@@ -50,6 +50,9 @@ export const WebSocketProvider = ({ children }) => {
           break;
         case "gameStarted":
           setGameStarted(true);
+          setGameData("Get ready to play!");
+          setCurrentCard([0, 0, 0, 0, 0, 0, 0, 0]);
+          setCurrentGroupCard([0, 0, 0, 0, 0, 0, 0, 0]);
           break;
         case "cards":
           if (response.card) {

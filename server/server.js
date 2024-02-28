@@ -23,6 +23,10 @@ const getPlayers = () => {
 
 const beginGame = () => {
   playing = true;
+  gameScores = {};
+  Object.keys(clients).forEach((ws) => {
+    gameScores[ws] = { name: clients[ws].name, score: 0 };
+  });
   cards = createCards();
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
@@ -45,7 +49,7 @@ const sendCards = (winner) => {
     return;
   }
   if (winner) {
-    gameScores[winner] += 1;
+    gameScores[winner].score += 1;
     gameData = `${clients[winner].name} got that one!`;
     newCard = cards.pop();
     winner.send(
@@ -138,6 +142,9 @@ wss.on("connection", function connection(ws) {
     // Remove client from the clients object on disconnect
     console.log("Client disconnected:", clients[ws].name);
     delete clients[ws];
+    if (Object.keys(clients).length === 0) {
+      playing = false;
+    }
   });
 });
 
