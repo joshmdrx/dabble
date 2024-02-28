@@ -56,17 +56,69 @@ const updateAllReady = () => {
     }
   });
 };
+const handleGameEnd = () => {
+  playing = false;
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: "gameOver" }));
+    }
+  });
+  setTimeout(() => {
+    sendResults();
+  }, 2000);
+};
+const setAllNotReady = () => {
+  Object.keys(clients).forEach((name) => {
+    clients[name].ready = false;
+  });
+  updateAllReady();
+};
+const sendResults = () => {
+  // Determine the highest score
+  const highestScore = Math.max(
+    ...Object.values(gameScores).map((score) => score.score)
+  );
+
+  // Identify all players with the highest score
+  const winners = Object.keys(gameScores).filter(
+    (name) => gameScores[name].score === highestScore
+  );
+
+  // Update the message based on the number of winners
+  let message;
+  if (winners.length === 1) {
+    message = `${winners[0]} won!`;
+    // The sole winner gets 1 point added
+    clients[winners[0]].score += 1;
+  } else {
+    message = `${winners.join(", ")} drew!`;
+    // Each player in a draw gets 0.5 added to their score
+    winners.forEach((winner) => {
+      clients[winner].score += 0.5;
+    });
+  }
+
+  console.log("message", message);
+
+  const scores = Object.keys(gameScores).map((name) => {
+    return { name, score: gameScores[name].score };
+  });
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: "results", scores, message }));
+    }
+  });
+  setAllNotReady();
+  updatePlayers();
+};
 const sendCards = (winner) => {
+  console.log("Sending cards");
   if (cards.length <= 0) {
+    console.log("No more cards");
     if (winner) {
       gameScores[winner].score += 1;
     }
-    playing = false;
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ type: "gameOver" }));
-      }
-    });
+    handleGameEnd();
     return;
   }
   if (winner) {

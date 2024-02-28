@@ -41,7 +41,7 @@ export const imageLookup = {
   39: "net.png",
   40: "no_entry.png",
   41: "padlock.png",
-  42: "pencil.png",
+  42: "white.png", //"pencil.png",
   43: "question_mark.png",
   44: "scissors.png",
   45: "skull.png",

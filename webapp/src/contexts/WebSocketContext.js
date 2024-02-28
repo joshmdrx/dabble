@@ -23,6 +23,7 @@ export const WebSocketProvider = ({ children }) => {
   const [currentCard, setCurrentCard] = useState(defaultCard);
   const [currentGroupCard, setCurrentGroupCard] = useState(defaultCard);
   const [gameData, setGameData] = useState("");
+  const [gameScores, setGameScores] = useState([]);
 
   useEffect(() => {
     // Initialize WebSocket connection
@@ -62,11 +63,19 @@ export const WebSocketProvider = ({ children }) => {
             setCurrentGroupCard(response.groupCard);
           }
           if (response.gameData) {
-            setGameData(parseGameData(response.gameData));
+            setGameData(response.gameData);
           }
           break;
         case "gameData":
-          setGameData(parseGameData(response.data));
+          setGameData(response.gameData);
+          break;
+        case "gameOver":
+          setGameStarted(false);
+          setGameData("Game Over!");
+          break;
+        case "results":
+          setGameScores(response.scores);
+          setGameData(response.message);
           break;
       }
     };
@@ -117,15 +126,6 @@ export const WebSocketProvider = ({ children }) => {
     }
   };
 
-  const parseGameData = (data) => {
-    const checkString = `${userName} got that one!`;
-    console.log(data, checkString, data === checkString);
-    if (data === checkString) {
-      return "You got that one!";
-    }
-    return data;
-  };
-
   const value = useMemo(
     () => ({
       connect,
@@ -141,6 +141,7 @@ export const WebSocketProvider = ({ children }) => {
       currentGroupCard,
       sendMatch,
       gameData,
+      gameScores,
     }),
     [
       isConnected,
@@ -155,6 +156,7 @@ export const WebSocketProvider = ({ children }) => {
       gameStarted,
       sendMatch,
       gameData,
+      gameScores,
     ]
   );
 
