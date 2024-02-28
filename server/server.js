@@ -8,6 +8,10 @@ const wss = new WebSocket.Server({ port: PORT });
 const clients = {}; // Object to hold connected clients
 let playing = false;
 let cards;
+let gameScores = {};
+let gameData = "";
+let newCard;
+let gameCard;
 
 const getPlayers = () => {
   const players = [];
@@ -15,6 +19,72 @@ const getPlayers = () => {
     players.push({ name: clients[ws].name, score: clients[ws].score });
   });
   return players;
+};
+
+const beginGame = () => {
+  playing = true;
+  cards = createCards();
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: "gameStarted" }));
+    }
+  });
+  setTimeout(() => {
+    sendCards();
+  }, 1000);
+};
+
+const sendCards = (winner) => {
+  if (cards.length === 0) {
+    playing = false;
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: "gameOver" }));
+      }
+    });
+    return;
+  }
+  if (winner) {
+    gameScores[winner] += 1;
+    gameData = `${clients[winner].name} got that one!`;
+    newCard = cards.pop();
+    winner.send(
+      JSON.stringify({
+        type: "cards",
+        card: gameCard,
+        groupCard: newCard,
+        gameData: gameData,
+      })
+    );
+    wss.clients.forEach((client) => {
+      if (client !== winner && client.readyState === WebSocket.OPEN) {
+        client.send(
+          JSON.stringify({
+            type: "cards",
+            groupCard: newCard,
+            gameData: gameData,
+          })
+        );
+      }
+    });
+    gameCard = newCard;
+  } else {
+    gameData = "BEGIN!";
+    gameCard = cards.pop();
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        let card = cards.pop();
+        client.send(
+          JSON.stringify({
+            type: "cards",
+            card: card,
+            groupCard: gameCard,
+            gameData: gameData,
+          })
+        );
+      }
+    });
+  }
 };
 
 wss.on("connection", function connection(ws) {
@@ -57,13 +127,10 @@ wss.on("connection", function connection(ws) {
       if (playing) {
         return;
       }
-      playing = true;
-      cards = createCards();
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ type: "gameStarted" }));
-        }
-      });
+      beginGame();
+    }
+    if (data.type === "match") {
+      sendCards(ws);
     }
   });
 

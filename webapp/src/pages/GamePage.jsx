@@ -25,6 +25,10 @@ const GamePage = () => {
       sendMatch(myCardSymbol);
     }
   };
+  useEffect(() => {
+    setMyCardSymbol("");
+    setGroupCardSymbol("");
+  }, [currentCard, currentGroupCard]);
 
   return (
     <div
@@ -39,9 +43,7 @@ const GamePage = () => {
       }}
     >
       <h1 style={{ color: "white" }}>Dabble</h1>
-      <h3 style={{ color: "white", paddingBottom: "30px" }}>
-        {"a got that one"}
-      </h3>
+      <h3 style={{ color: "white", paddingBottom: "30px" }}>{gameData}</h3>
       <div style={{ paddingBottom: "30px" }}>
         <Card srcs={currentGroupCard} onClick={clickGroupCard} />
       </div>

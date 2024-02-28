@@ -51,12 +51,19 @@ export const WebSocketProvider = ({ children }) => {
         case "gameStarted":
           setGameStarted(true);
           break;
-        case "currentCard":
-          setCurrentCard(response.card);
-          setCurrentGroupCard(response.groupCard);
+        case "cards":
+          if (response.card) {
+            setCurrentCard(response.card);
+          }
+          if (response.groupCard) {
+            setCurrentGroupCard(response.groupCard);
+          }
+          if (response.gameData) {
+            setGameData(response.gameData);
+          }
           break;
         case "gameData":
-          setGameData(response.data);
+          setGameData(response.gameData);
           break;
       }
     };
