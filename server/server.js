@@ -140,7 +140,6 @@ wss.on("connection", function connection(ws) {
 
   ws.on("close", () => {
     // Remove client from the clients object on disconnect
-    console.log("Client disconnected:", clients[ws].name);
     delete clients[ws];
     if (Object.keys(clients).length === 0) {
       playing = false;
