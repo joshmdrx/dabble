@@ -55,8 +55,13 @@ const Card = ({ srcs, onClick }) => {
     // const size = Math.random() * (80 - 50) + 30; // Random size between 30px and 60px
     const size = sizes[i];
     const rotation = rotations[i];
-
-    const url = `${imagePath}${imageLookup[srcs[i]]}`;
+    // const imagePath = imageLookup[srcs[i]];
+    // console.log(imagePath);
+    // // const url = imagePath.startsWith("https")
+    // //   ? imagePath
+    // //   : `${imagePath}${imagePath}`;
+    // const url = `${imagePath}${imageLookup[srcs[i]]}`;
+    const url = `${imageLookup[srcs[i]]}`;
 
     symbols.push(
       <Symbol

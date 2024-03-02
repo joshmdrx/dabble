@@ -8,6 +8,11 @@ import React, {
   useMemo,
 } from "react";
 
+// load websocket url from dotenv
+
+const WS_URL = process.env.REACT_APP_WS_URL;
+const HTTPS_URL = process.env.REACT_APP_HTTPS_URL;
+
 const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }) => {
@@ -28,10 +33,35 @@ export const WebSocketProvider = ({ children }) => {
   useEffect(() => {
     // Initialize WebSocket connection
     createConnection();
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+    };
   }, []);
 
+  const skip_warning = () => {
+    let error = true;
+    let c = 0;
+    do {
+      c += 1;
+      fetch(HTTPS_URL, {
+        method: "get",
+        headers: new Headers({
+          "ngrok-skip-browser-warning": "69420",
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => (error = false))
+        .catch((err) => {
+          console.log(err);
+        });
+    } while (error | (c < 5));
+  };
+
   const createConnection = () => {
-    const websocket = new WebSocket("ws://localhost:8123");
+    // skip_warning();
+    const websocket = new WebSocket(WS_URL);
 
     websocket.onmessage = (event) => {
       const response = JSON.parse(event.data);
