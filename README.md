@@ -9,6 +9,7 @@ Each player has an individual card, with the shared card at the top of the scree
 ## Structure
 
 `/server` holds code for a node.js websocket server that handles connections for multiple players
+
 `/webapp` holds code for a React app for client connections
 
 ## Run
