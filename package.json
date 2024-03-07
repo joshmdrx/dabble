@@ -1,0 +1,26 @@
+{
+  "name": "dabble",
+  "version": "1.0.0",
+  "description": "Dabbling in Dobble",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"npm run start --prefix webapp\" \"npm run start --prefix server\"",
+    "postinstall": "npm run install:webapp && npm run install:server",
+    "install:webapp": "cd webapp && npm install",
+    "install:server": "cd server && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshmdrx/dabble.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joshmdrx/dabble/issues"
+  },
+  "homepage": "https://github.com/joshmdrx/dabble#readme",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
